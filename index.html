@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan7 | Organizador de Tarefas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A1626;--ink:#0F1F33;--card:#0F2138;--line:#E2E8F0;--blue:#1D6FD8;--blue2:#4DA3FF;--mut:#5B6B80;--band:#F1F5F9}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Jost",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:400;background:var(--band);color:var(--ink)}
+b,strong{font-weight:500}
+header{background:var(--navy);padding:22px 16px 26px}
+.hin{max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:14px}
+.brand svg{width:56px;height:56px;flex:none}
+.bn{font-weight:500;font-size:1.6rem;letter-spacing:.04em;color:#fff;line-height:1}
+.bn i{font-style:normal;color:var(--blue2)}
+.bs{font-weight:500;font-size:.68rem;letter-spacing:.22em;color:#9FB0C4;margin-top:6px}
+.bl{font-size:.6rem;letter-spacing:.2em;color:var(--blue2);margin-top:4px;font-weight:500}
+.hoje{color:#9FB0C4;font-size:.9rem;margin-top:18px}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 110px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#E2E8F0;border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{border:0;background:none;padding:11px;border-radius:11px;font:inherit;font-weight:500;color:var(--mut);cursor:pointer;letter-spacing:.02em}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(10,22,38,.12)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid #2A3B52;border-radius:20px;padding:14px}
+.stat b{display:block;font-size:1.2rem;color:#fff}
+.stat span{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue2);font-weight:500}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#fff;padding:7px 16px;border-radius:99px;cursor:pointer;font:inherit;font-size:.88rem;color:var(--ink)}
+.tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.day{margin:22px 0 8px;font-size:.7rem;text-transform:uppercase;letter-spacing:.2em;color:var(--blue);font-weight:500;display:flex;gap:8px;align-items:center}
+.day em{font-style:normal;background:var(--navy);color:#fff;border-radius:99px;padding:2px 10px;font-size:.62rem;letter-spacing:.12em}
+.task{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:20px;padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.task.receber{border-left-color:var(--navy)}
+.task.done{opacity:.5}
+.task.done .t{text-decoration:line-through}
+.chk{width:22px;height:22px;margin-top:2px;accent-color:var(--blue);flex:none;cursor:pointer}
+.body{flex:1;min-width:0}
+.t{font-weight:500}
+.tp{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:500;margin-bottom:3px}
+.meta{font-size:.85rem;color:var(--mut);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.val{color:var(--ink);font-weight:500}
+.act{display:flex;gap:2px}
+.ib{background:none;border:0;cursor:pointer;font:inherit;font-size:.78rem;padding:5px 8px;border-radius:8px;color:var(--mut)}
+.ib:hover{background:var(--band);color:var(--ink)}
+.empty{text-align:center;color:var(--mut);padding:40px 0}
+.fab{position:fixed;right:16px;bottom:20px;background:var(--blue);color:#fff;border:0;border-radius:99px;padding:14px 22px;font:inherit;font-size:1rem;font-weight:500;box-shadow:0 4px 14px rgba(29,111,216,.35);cursor:pointer}
+.fab2{position:fixed;left:16px;bottom:20px;background:var(--navy);color:#fff;border:0;border-radius:99px;padding:14px 20px;font:inherit;font-size:1rem;font-weight:500;cursor:pointer}
+.ov{position:fixed;inset:0;background:rgba(10,22,38,.6);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.ov.on{display:flex}
+.modal{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:22px;max-height:92vh;overflow:auto}
+@media(min-width:600px){.ov{align-items:center}.modal{border-radius:24px}}
+.modal h2{margin:0 0 12px;font-size:1.2rem;font-weight:500}
+label{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:500;margin:12px 0 4px}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btns{display:flex;gap:10px;margin-top:18px}
+.btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:500;cursor:pointer;color:var(--ink)}
+.btn.p{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mic{width:100%;margin-bottom:4px;padding:11px;border-radius:12px;border:1px dashed var(--blue);background:#F1F6FD;color:var(--blue);font:inherit;font-weight:500;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:14px;font-size:.9rem;max-width:90%;display:none;z-index:9}
+.contact{position:fixed;left:0;right:0;bottom:0;background:var(--navy);padding:10px 12px;z-index:4}
+.cin{max-width:760px;margin:0 auto;background:#fff;border-radius:20px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cw{font-weight:500;font-size:.95rem}
+.cw small{display:block;font-weight:400;font-size:.72rem;color:var(--mut)}
+.loc{display:inline-flex;align-items:center;gap:6px;background:#E8F1FD;color:var(--blue);border-radius:99px;padding:6px 12px;font-size:.78rem;font-weight:500}
+</style>
+</head>
+<body>
+<header>
+  <div class="hin">
+    <div class="brand">
+      <svg viewBox="0 0 100 100" aria-label="Plan7">
+        <circle cx="50" cy="50" r="48" fill="none" stroke="#4DA3FF" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="42" fill="#FFFFFF"/>
+        <polygon points="58,16 32,56 48,56 42,86 70,43 54,43" fill="#0A1626"/>
+      </svg>
+      <div>
+        <div class="bn">PLAN<i>7</i></div>
+        <div class="bs">SERVIÇOS E ENGENHARIA</div>
+        <div class="bl">PROJETOS · INSTALAÇÕES ELÉTRICAS · CLIMATIZAÇÃO</div>
+      </div>
+    </div>
+    <div class="hoje" id="hoje"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="seg" id="seg">
+    <button class="on" data-v="tarefa">Tarefas</button>
+    <button data-v="receber">Recebimentos</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="sPend">0</b><span>Tarefas pendentes</span></div>
+    <div class="stat"><b id="sRec">R$ 0</b><span>A receber</span></div>
+    <div class="stat"><b id="sOk">R$ 0</b><span>Já recebido</span></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-f="pend">Pendentes</button>
+    <button class="tab" data-f="all">Todas</button>
+    <button class="tab" data-f="done">Concluídas</button>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<button class="fab2" id="voice">Falar</button>
+<button class="fab" id="add">+ Nova tarefa</button>
+<div class="toast" id="toast"></div>
+
+<div class="ov" id="ov">
+  <form class="modal" id="form">
+    <h2 id="mt">Nova tarefa</h2>
+    <button type="button" class="mic" id="micForm">Preencher por voz</button>
+    <label>Título</label>
+    <input id="fTitle" required placeholder="Ex.: Instalação de ar-condicionado">
+    <div class="row">
+      <div><label>Data</label><input type="date" id="fDate" required></div>
+      <div><label>Horário (opcional)</label><input type="time" id="fTime"></div>
+    </div>
+    <div class="row">
+      <div><label>Tipo</label>
+        <select id="fType">
+          <option value="servico">Serviço</option>
+          <option value="receber">Recebimento</option>
+          <option value="divulgacao">Divulgação</option>
+          <option value="outro">Outro</option>
+        </select></div>
+      <div><label>Valor R$ (opcional)</label><input type="number" id="fVal" min="0" step="0.01" placeholder="0,00"></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--ink);font-weight:400"><input type="checkbox" id="fAuto" checked style="width:auto;accent-color:#1D6FD8">Serviço com valor: criar também o recebimento na mesma data</label>
+    <label>Cliente / empresa (opcional)</label>
+    <input id="fWho">
+    <label>Observações (opcional)</label>
+    <textarea id="fNotes" rows="2"></textarea>
+    <div class="btns">
+      <button type="button" class="btn" id="cancel">Cancelar</button>
+      <button class="btn p">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const KEY="organizador-tarefas-v1";
+const initial=[
+ {id:1,title:"Criar arte de divulgação (limpeza/instalação de ar-condicionado e instalações elétricas residenciais)",date:"2026-11-19",time:"",type:"divulgacao",value:"",who:"",notes:"Divulgar no grupo da igreja e para amigos mais próximos.",done:false},
+ {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã da igreja",notes:"",done:false},
+ {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"",done:false},
+ {id:6,title:"Receber: limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"",type:"receber",value:500,who:"Irmã da igreja",notes:"",done:false},
+ {id:7,title:"Receber: 2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"",type:"receber",value:400,who:"Diego Campos",notes:"",done:false},
+ {id:8,title:"Limpeza de 2 ar-condicionados",date:"2026-11-18",time:"",type:"servico",value:400,who:"Felipe",notes:"Data a confirmar.",done:false},
+ {id:9,title:"Receber: limpeza de 2 ar-condicionados",date:"2026-11-18",time:"",type:"receber",value:400,who:"Felipe",notes:"Data a confirmar.",done:false},
+ {id:4,title:"Receber contrato (planejamento)",date:"2026-12-05",time:"",type:"receber",value:800,who:"LG Instalações",notes:"",done:false},
+ {id:5,title:"Receber pagamento",date:"2026-12-05",time:"",type:"receber",value:750,who:"Burim Refrigeração",notes:"",done:false}
+];
+let tasks,filter="pend",view="tarefa",editing=null,mem=null;
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return mem||initial.map(x=>({...x}))}
+function save(){mem=tasks;try{localStorage.setItem(KEY,JSON.stringify(tasks))}catch(e){}}
+tasks=load();
+/* migração: recebimentos de sexta (20/11) para quem já tinha dados salvos */
+try{
+  if(!localStorage.getItem("organizador-mig2")){
+    for(const n of initial.filter(x=>x.id===6||x.id===7)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
+    const d=tasks.find(t=>t.id===3); if(d&&(d.value===""||d.value==null)) d.value=400;
+    save(); localStorage.setItem("organizador-mig2","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig3")){
+    for(const n of initial.filter(x=>x.id===8||x.id===9)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
+    save(); localStorage.setItem("organizador-mig3","1");
+  }
+}catch(e){}
+
+const $=s=>document.querySelector(s);
+const money=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2});
+const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function label(iso){
+  const t=new Date(todayISO()+"T00:00"),d=new Date(iso+"T00:00"),diff=Math.round((d-t)/864e5);
+  const txt=d.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"});
+  return {txt,diff,tag:diff<0?"Atrasada":diff===0?"Hoje":diff===1?"Amanhã":""};
+}
+const names={servico:"Serviço",receber:"Recebimento",divulgacao:"Divulgação",outro:"Outro"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  $("#hoje").textContent="Hoje é "+new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("#sPend").textContent=tasks.filter(t=>t.type!=="receber"&&!t.done).length;
+  const sum=f=>tasks.filter(t=>t.type==="receber"&&f(t)).reduce((a,t)=>a+(Number(t.value)||0),0);
+  $("#sRec").textContent=money(sum(t=>!t.done));
+  $("#sOk").textContent=money(sum(t=>t.done));
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.f===filter));
+  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+  $("#tabs").children[0].textContent=view==="receber"?"A receber":"Pendentes";
+  $("#tabs").children[2].textContent=view==="receber"?"Recebidos":"Concluídas";
+  $("#add").textContent=view==="receber"?"+ Novo recebimento":"+ Nova tarefa";
+
+  const vis=tasks.filter(t=>(view==="receber")===(t.type==="receber"))
+    .filter(t=>filter==="all"||(filter==="pend"?!t.done:t.done))
+    .sort((a,b)=>(a.date+(a.time||"99:99")).localeCompare(b.date+(b.time||"99:99")));
+  if(!vis.length){$("#list").innerHTML='<div class="empty">Nada por aqui.</div>';return}
+  let html="",last="";
+  for(const t of vis){
+    if(t.date!==last){last=t.date;const l=label(t.date);
+      html+=`<div class="day">${l.txt}${l.tag?`<em>${l.tag}</em>`:""}</div>`}
+    html+=`<div class="task ${t.type} ${t.done?"done":""}">
+      <input type="checkbox" class="chk" ${t.done?"checked":""} data-id="${t.id}" data-a="tog">
+      <div class="body">
+        <div class="tp">${names[t.type]||""}</div>
+        <div class="t">${esc(t.title)}</div>
+        <div class="meta">
+          ${t.time?`<span>${esc(t.time)}</span>`:""}
+          ${t.who?`<span>${esc(t.who)}</span>`:""}
+          ${t.value!==""&&t.value!=null?`<span class="val">${money(t.value)}</span>`:""}
+        </div>
+        ${t.notes?`<div class="meta">${esc(t.notes)}</div>`:""}
+      </div>
+      <div class="act">
+        <button class="ib" data-id="${t.id}" data-a="edit">Editar</button>
+        <button class="ib" data-id="${t.id}" data-a="del">Excluir</button>
+      </div></div>`;
+  }
+  $("#list").innerHTML=html;
+}
+
+$("#list").addEventListener("click",e=>{
+  const el=e.target.closest("[data-a]");if(!el)return;
+  const id=+el.dataset.id,t=tasks.find(x=>x.id===id),a=el.dataset.a;
+  if(a==="tog"){t.done=el.checked;save();render()}
+  if(a==="del"){if(el.dataset.sure){tasks=tasks.filter(x=>x.id!==id);save();render()}
+    else{el.dataset.sure=1;el.textContent="Confirmar?";setTimeout(()=>{el.dataset.sure="";el.textContent="Excluir"},2500)}}
+  if(a==="edit")openForm(t);
+});
+$("#tabs").addEventListener("click",e=>{if(e.target.dataset.f){filter=e.target.dataset.f;render()}});
+$("#seg").addEventListener("click",e=>{if(e.target.dataset.v){view=e.target.dataset.v;render()}});
+
+/* ---------- Voz ---------- */
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",4500)}
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const dias=["domingo","segunda","terca","quarta","quinta","sexta","sabado"];
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parseVoice(raw){
+  const s=norm(raw),now=new Date(todayISO()+"T00:00");let date=null;
+  if(/depois de amanha/.test(s)){date=new Date(now);date.setDate(date.getDate()+2)}
+  else if(/amanha/.test(s)){date=new Date(now);date.setDate(date.getDate()+1)}
+  else if(/\bhoje\b/.test(s))date=new Date(now);
+  else{
+    const wd=dias.findIndex(d=>new RegExp("\\b"+d).test(s));
+    const dm=s.match(/\bdia (\d{1,2})\b/);
+    if(wd>=0){date=new Date(now);let add=(wd-now.getDay()+7)%7;date.setDate(date.getDate()+add)}
+    else if(dm){const n=+dm[1];date=new Date(now.getFullYear(),now.getMonth(),n);if(date<now)date=new Date(now.getFullYear(),now.getMonth()+1,n)}
+  }
+  let time="";const tm=s.match(/(\d{1,2})\s*(?:h|horas?|:)\s*(?:e\s*)?(\d{2})?/);
+  if(tm){let h=+tm[1];if(/tarde|noite/.test(s)&&h<12)h+=12;if(h<24)time=String(h).padStart(2,"0")+":"+(tm[2]||"00")}
+  const vm=s.match(/(?:r\$\s*)?(\d+(?:[.,]\d{1,2})?)\s*(?:reais|real|r\$)/)||s.match(/r\$\s*(\d+(?:[.,]\d{1,2})?)/);
+  const value=vm?parseFloat(vm[1].replace(",",".")):"";
+  const type=/receb|pagamento|contrato|pagar|cobrar/.test(s)?"receber":/divulg|arte|post/.test(s)?"divulgacao":"servico";
+  return {title:raw.trim().charAt(0).toUpperCase()+raw.trim().slice(1),date:date?iso(date):todayISO(),time,value,type};
+}
+function listen(cb){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast("Este navegador não tem reconhecimento de voz. Use o Chrome.");return}
+  const r=new SR();r.lang="pt-BR";r.interimResults=false;
+  r.onstart=()=>toast("Ouvindo... fale agora");
+  r.onresult=e=>cb(e.results[0][0].transcript);
+  r.onerror=e=>toast("Não consegui usar o microfone ("+e.error+"). Verifique a permissão do navegador.");
+  try{r.start()}catch(e){toast("Não foi possível iniciar o microfone.")}
+}
+function baixa(raw){
+  const words=norm(raw).split(/\W+/).filter(w=>w.length>3&&!["baixa","concluida","concluido","recebi","terminei","fiz","dar","tarefa","pagamento"].includes(w));
+  let best=null,score=0;
+  for(const t of tasks.filter(t=>!t.done)){
+    const hay=norm(t.title+" "+t.who);const sc=words.filter(w=>hay.includes(w)).length;
+    if(sc>score){score=sc;best=t}
+  }
+  if(!best){toast("Não achei qual tarefa dar baixa. Fale o nome do cliente ou do serviço.");return}
+  best.done=true;save();render();toast("Baixa dada: "+best.title+(best.who?" ("+best.who+")":""));
+}
+function fillForm(d){$("#fTitle").value=d.title;$("#fDate").value=d.date;$("#fTime").value=d.time;$("#fType").value=d.type;$("#fVal").value=d.value}
+function handleVoice(raw){
+  if(/^\s*(dar baixa|baixa|concluir|conclui|recebi|terminei|fiz)/i.test(norm(raw))){baixa(raw);return}
+  openForm();fillForm(parseVoice(raw));toast("Confira os campos e toque em Salvar.");
+}
+$("#voice").onclick=()=>listen(handleVoice);
+$("#micForm").onclick=()=>listen(t=>fillForm(parseVoice(t)));
+
+function openForm(t){
+  editing=t||null;$("#mt").textContent=t?"Editar tarefa":"Nova tarefa";
+  $("#fTitle").value=t?t.title:"";$("#fDate").value=t?t.date:todayISO();$("#fTime").value=t?t.time:"";
+  $("#fType").value=t?t.type:(view==="receber"?"receber":"servico");$("#fVal").value=t?t.value:"";$("#fWho").value=t?t.who:"";$("#fNotes").value=t?t.notes:"";
+  $("#fAuto").checked=!t;$("#fAuto").parentElement.style.display=t?"none":"flex";
+  $("#ov").classList.add("on");setTimeout(()=>$("#fTitle").focus(),50);
+}
+const close=()=>$("#ov").classList.remove("on");
+$("#add").onclick=()=>openForm();
+$("#cancel").onclick=close;
+$("#ov").addEventListener("click",e=>{if(e.target.id==="ov")close()});
+$("#form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const d={title:$("#fTitle").value.trim(),date:$("#fDate").value,time:$("#fTime").value,type:$("#fType").value,
+    value:$("#fVal").value===""?"":Number($("#fVal").value),who:$("#fWho").value.trim(),notes:$("#fNotes").value.trim()};
+  if(editing)Object.assign(editing,d);
+  else{
+    tasks.push({id:Date.now(),done:false,...d});
+    if(d.type!=="receber"&&d.value!==""&&d.value>0&&$("#fAuto").checked)
+      tasks.push({id:Date.now()+1,done:false,title:"Receber: "+d.title,date:d.date,time:"",type:"receber",value:d.value,who:d.who,notes:""});
+  }
+  save();close();render();
+});
+render();
+</script>
+</body>
+</html>
