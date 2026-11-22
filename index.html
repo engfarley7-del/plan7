@@ -48,8 +48,7 @@ header{background:var(--navy);padding:22px 16px 26px}
 .ib{background:none;border:0;cursor:pointer;font:inherit;font-size:.78rem;padding:5px 8px;border-radius:8px;color:var(--mut)}
 .ib:hover{background:var(--band);color:var(--ink)}
 .empty{text-align:center;color:var(--mut);padding:40px 0}
-.fab{position:fixed;right:16px;bottom:20px;background:var(--blue);color:#fff;border:0;border-radius:99px;padding:14px 22px;font:inherit;font-size:1rem;font-weight:500;box-shadow:0 4px 14px rgba(29,111,216,.35);cursor:pointer}
-.fab2{position:fixed;left:16px;bottom:20px;background:var(--navy);color:#fff;border:0;border-radius:99px;padding:14px 20px;font:inherit;font-size:1rem;font-weight:500;cursor:pointer}
+.fab{position:fixed;left:16px;bottom:20px;background:var(--blue);color:#fff;border:0;border-radius:99px;padding:14px 22px;font:inherit;font-size:1rem;font-weight:500;box-shadow:0 4px 14px rgba(29,111,216,.35);cursor:pointer}
 .ov{position:fixed;inset:0;background:rgba(10,22,38,.6);display:none;align-items:flex-end;justify-content:center;z-index:5}
 .ov.on{display:flex}
 .modal{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:22px;max-height:92vh;overflow:auto}
@@ -61,8 +60,6 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
 .btns{display:flex;gap:10px;margin-top:18px}
 .btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:500;cursor:pointer;color:var(--ink)}
 .btn.p{background:var(--navy);color:#fff;border-color:var(--navy)}
-.mic{width:100%;margin-bottom:4px;padding:11px;border-radius:12px;border:1px dashed var(--blue);background:#F1F6FD;color:var(--blue);font:inherit;font-weight:500;cursor:pointer}
-.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:14px;font-size:.9rem;max-width:90%;display:none;z-index:9}
 .contact{position:fixed;left:0;right:0;bottom:0;background:var(--navy);padding:10px 12px;z-index:4}
 .cin{max-width:760px;margin:0 auto;background:#fff;border-radius:20px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .cw{font-weight:500;font-size:.95rem}
@@ -110,14 +107,11 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
   <div id="list"></div>
 </div>
 
-<button class="fab2" id="voice">Falar</button>
 <button class="fab" id="add">+ Nova tarefa</button>
-<div class="toast" id="toast"></div>
 
 <div class="ov" id="ov">
   <form class="modal" id="form">
     <h2 id="mt">Nova tarefa</h2>
-    <button type="button" class="mic" id="micForm">Preencher por voz</button>
     <label>Título</label>
     <input id="fTitle" required placeholder="Ex.: Instalação de ar-condicionado">
     <div class="row">
@@ -251,56 +245,6 @@ $("#list").addEventListener("click",e=>{
 });
 $("#tabs").addEventListener("click",e=>{if(e.target.dataset.f){filter=e.target.dataset.f;render()}});
 $("#seg").addEventListener("click",e=>{if(e.target.dataset.v){view=e.target.dataset.v;render()}});
-
-/* ---------- Voz ---------- */
-function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",4500)}
-const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
-const dias=["domingo","segunda","terca","quarta","quinta","sexta","sabado"];
-function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function parseVoice(raw){
-  const s=norm(raw),now=new Date(todayISO()+"T00:00");let date=null;
-  if(/depois de amanha/.test(s)){date=new Date(now);date.setDate(date.getDate()+2)}
-  else if(/amanha/.test(s)){date=new Date(now);date.setDate(date.getDate()+1)}
-  else if(/\bhoje\b/.test(s))date=new Date(now);
-  else{
-    const wd=dias.findIndex(d=>new RegExp("\\b"+d).test(s));
-    const dm=s.match(/\bdia (\d{1,2})\b/);
-    if(wd>=0){date=new Date(now);let add=(wd-now.getDay()+7)%7;date.setDate(date.getDate()+add)}
-    else if(dm){const n=+dm[1];date=new Date(now.getFullYear(),now.getMonth(),n);if(date<now)date=new Date(now.getFullYear(),now.getMonth()+1,n)}
-  }
-  let time="";const tm=s.match(/(\d{1,2})\s*(?:h|horas?|:)\s*(?:e\s*)?(\d{2})?/);
-  if(tm){let h=+tm[1];if(/tarde|noite/.test(s)&&h<12)h+=12;if(h<24)time=String(h).padStart(2,"0")+":"+(tm[2]||"00")}
-  const vm=s.match(/(?:r\$\s*)?(\d+(?:[.,]\d{1,2})?)\s*(?:reais|real|r\$)/)||s.match(/r\$\s*(\d+(?:[.,]\d{1,2})?)/);
-  const value=vm?parseFloat(vm[1].replace(",",".")):"";
-  const type=/receb|pagamento|contrato|pagar|cobrar/.test(s)?"receber":/divulg|arte|post/.test(s)?"divulgacao":"servico";
-  return {title:raw.trim().charAt(0).toUpperCase()+raw.trim().slice(1),date:date?iso(date):todayISO(),time,value,type};
-}
-function listen(cb){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast("Este navegador não tem reconhecimento de voz. Use o Chrome.");return}
-  const r=new SR();r.lang="pt-BR";r.interimResults=false;
-  r.onstart=()=>toast("Ouvindo... fale agora");
-  r.onresult=e=>cb(e.results[0][0].transcript);
-  r.onerror=e=>toast("Não consegui usar o microfone ("+e.error+"). Verifique a permissão do navegador.");
-  try{r.start()}catch(e){toast("Não foi possível iniciar o microfone.")}
-}
-function baixa(raw){
-  const words=norm(raw).split(/\W+/).filter(w=>w.length>3&&!["baixa","concluida","concluido","recebi","terminei","fiz","dar","tarefa","pagamento"].includes(w));
-  let best=null,score=0;
-  for(const t of tasks.filter(t=>!t.done)){
-    const hay=norm(t.title+" "+t.who);const sc=words.filter(w=>hay.includes(w)).length;
-    if(sc>score){score=sc;best=t}
-  }
-  if(!best){toast("Não achei qual tarefa dar baixa. Fale o nome do cliente ou do serviço.");return}
-  best.done=true;save();render();toast("Baixa dada: "+best.title+(best.who?" ("+best.who+")":""));
-}
-function fillForm(d){$("#fTitle").value=d.title;$("#fDate").value=d.date;$("#fTime").value=d.time;$("#fType").value=d.type;$("#fVal").value=d.value}
-function handleVoice(raw){
-  if(/^\s*(dar baixa|baixa|concluir|conclui|recebi|terminei|fiz)/i.test(norm(raw))){baixa(raw);return}
-  openForm();fillForm(parseVoice(raw));toast("Confira os campos e toque em Salvar.");
-}
-$("#voice").onclick=()=>listen(handleVoice);
-$("#micForm").onclick=()=>listen(t=>fillForm(parseVoice(t)));
 
 function openForm(t){
   editing=t||null;$("#mt").textContent=t?"Editar tarefa":"Nova tarefa";
