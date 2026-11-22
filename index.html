@@ -157,7 +157,7 @@ const KEY="organizador-tarefas-v1";
 const initial=[
  {id:1,title:"Criar arte de divulgação (limpeza/instalação de ar-condicionado e instalações elétricas residenciais)",date:"2026-11-19",time:"",type:"divulgacao",value:"",who:"",notes:"Divulgar no grupo da igreja e para amigos mais próximos.",done:false},
  {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã Neide",notes:"",done:false,pair:6,started:true,alert:"Parede ainda sem furo para a tubulação. Verificar com a irmã Neide: eu faço o furo ou ela indica um pedreiro?"},
- {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"",done:false,pair:7,started:true},
+ {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"",done:false,pair:7,started:true,alert:"Comprar parafusos e furar as hastes dos ventiladores para evitar movimentação."},
  {id:6,title:"Receber: limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"",type:"receber",value:500,who:"Irmã Neide",notes:"",done:true,pair:2},
  {id:7,title:"Receber: 2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"",type:"receber",value:400,who:"Diego Campos",notes:"",done:false,pair:3},
  {id:8,title:"Limpeza de 2 ar-condicionados",date:"2026-11-29",time:"",type:"servico",value:400,who:"Felipe",notes:"",done:false,pair:9},
@@ -228,6 +228,13 @@ try{
   if(!localStorage.getItem("organizador-mig8")){
     const t=tasks.find(x=>x.id===2); if(t&&!t.alert) t.alert="Parede ainda sem furo para a tubulação. Verificar com a irmã Neide: eu faço o furo ou ela indica um pedreiro?";
     save(); localStorage.setItem("organizador-mig8","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig9")){
+    const t=tasks.find(x=>x.id===3); if(t&&!t.alert) t.alert="Comprar parafusos e furar as hastes dos ventiladores para evitar movimentação.";
+    save(); localStorage.setItem("organizador-mig9","1");
   }
 }catch(e){}
 
