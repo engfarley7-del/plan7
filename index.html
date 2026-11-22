@@ -40,6 +40,8 @@ header{background:var(--navy);padding:22px 16px 26px}
 .task.late{background:#FEF2F2;border-color:#F3B4B4;border-left-color:#D93025}
 .task.late .tp{color:#D93025}
 .task.late .val{color:#B3261E}
+.warn{display:flex;gap:9px;align-items:flex-start;margin-top:9px;padding:9px 11px;border-radius:12px;background:#FFF4D6;border:1px solid #F0C24B;color:#6B4A00;font-size:.85rem;line-height:1.35}
+.warn svg{flex:none;margin-top:1px}
 .chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .chip{font:inherit;font-size:.74rem;font-weight:500;padding:4px 11px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--mut);cursor:pointer}
 .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
@@ -139,6 +141,8 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
     <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--ink);font-weight:400"><input type="checkbox" id="fAuto" checked style="width:auto;accent-color:#1D6FD8">Serviço com valor: criar também o recebimento na mesma data</label>
     <label>Cliente / empresa (opcional)</label>
     <input id="fWho">
+    <label>Atenção / impedimento (opcional)</label>
+    <input id="fAlert" placeholder="Ex.: parede sem furo, falta material">
     <label>Observações (opcional)</label>
     <textarea id="fNotes" rows="2"></textarea>
     <div class="btns">
@@ -152,7 +156,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
 const KEY="organizador-tarefas-v1";
 const initial=[
  {id:1,title:"Criar arte de divulgação (limpeza/instalação de ar-condicionado e instalações elétricas residenciais)",date:"2026-11-19",time:"",type:"divulgacao",value:"",who:"",notes:"Divulgar no grupo da igreja e para amigos mais próximos.",done:false},
- {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã Neide",notes:"",done:false,pair:6,started:true},
+ {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã Neide",notes:"",done:false,pair:6,started:true,alert:"Parede ainda sem furo para a tubulação. Verificar com a irmã Neide: eu faço o furo ou ela indica um pedreiro?"},
  {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"",done:false,pair:7,started:true},
  {id:6,title:"Receber: limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"",type:"receber",value:500,who:"Irmã Neide",notes:"",done:true,pair:2},
  {id:7,title:"Receber: 2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"",type:"receber",value:400,who:"Diego Campos",notes:"",done:false,pair:3},
@@ -220,6 +224,13 @@ try{
   }
 }catch(e){}
 
+try{
+  if(!localStorage.getItem("organizador-mig8")){
+    const t=tasks.find(x=>x.id===2); if(t&&!t.alert) t.alert="Parede ainda sem furo para a tubulação. Verificar com a irmã Neide: eu faço o furo ou ela indica um pedreiro?";
+    save(); localStorage.setItem("organizador-mig8","1");
+  }
+}catch(e){}
+
 const $=s=>document.querySelector(s);
 const money=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2});
 const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
@@ -264,6 +275,7 @@ function render(){
           ${t.value!==""&&t.value!=null?`<span class="val">${money(t.value)}</span>`:""}
         </div>
         ${t.notes?`<div class="meta">${esc(t.notes)}</div>`:""}
+        ${t.alert?`<div class="warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B26A00" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 2 20h20L12 3z" fill="#FFE08A"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="#B26A00"/></svg><span><b>Atenção:</b> ${esc(t.alert)}</span></div>`:""}
         ${t.type!=="receber"&&t.value!==""&&t.value!=null?`<div class="chips">
           ${t.done?"":`<button class="chip ${t.started?"on":""}" data-id="${t.id}" data-a="start">${t.started?"Em andamento":"Iniciar"}</button>`}
           <button class="chip pay ${isPaid(t)?"on":""}" data-id="${t.id}" data-a="pay">${isPaid(t)?"Pago":"Não pago"}</button></div>`:""}
@@ -292,7 +304,7 @@ $("#seg").addEventListener("click",e=>{if(e.target.dataset.v){view=e.target.data
 function openForm(t){
   editing=t||null;$("#mt").textContent=t?"Editar tarefa":"Nova tarefa";
   $("#fTitle").value=t?t.title:"";$("#fDate").value=t?t.date:todayISO();$("#fTime").value=t?t.time:"";
-  $("#fType").value=t?t.type:(view==="receber"?"receber":"servico");$("#fVal").value=t?t.value:"";$("#fWho").value=t?t.who:"";$("#fNotes").value=t?t.notes:"";
+  $("#fType").value=t?t.type:(view==="receber"?"receber":"servico");$("#fVal").value=t?t.value:"";$("#fWho").value=t?t.who:"";$("#fNotes").value=t?t.notes:"";$("#fAlert").value=t?(t.alert||""):"";
   $("#fAuto").checked=!t;$("#fAuto").parentElement.style.display=t?"none":"flex";
   $("#ov").classList.add("on");setTimeout(()=>$("#fTitle").focus(),50);
 }
@@ -303,7 +315,7 @@ $("#ov").addEventListener("click",e=>{if(e.target.id==="ov")close()});
 $("#form").addEventListener("submit",e=>{
   e.preventDefault();
   const d={title:$("#fTitle").value.trim(),date:$("#fDate").value,time:$("#fTime").value,type:$("#fType").value,
-    value:$("#fVal").value===""?"":Number($("#fVal").value),who:$("#fWho").value.trim(),notes:$("#fNotes").value.trim()};
+    value:$("#fVal").value===""?"":Number($("#fVal").value),who:$("#fWho").value.trim(),notes:$("#fNotes").value.trim(),alert:$("#fAlert").value.trim()};
   if(editing)Object.assign(editing,d);
   else{
     const id=Date.now();
