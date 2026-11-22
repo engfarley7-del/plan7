@@ -150,12 +150,12 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
 const KEY="organizador-tarefas-v1";
 const initial=[
  {id:1,title:"Criar arte de divulgação (limpeza/instalação de ar-condicionado e instalações elétricas residenciais)",date:"2026-11-19",time:"",type:"divulgacao",value:"",who:"",notes:"Divulgar no grupo da igreja e para amigos mais próximos.",done:false},
- {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã da igreja",notes:"",done:false},
- {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"",done:false},
- {id:6,title:"Receber: limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"",type:"receber",value:500,who:"Irmã da igreja",notes:"",done:false},
+ {id:2,title:"Limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"07:00",type:"servico",value:500,who:"Irmã Neide",notes:"Serviço iniciado.",done:false},
+ {id:3,title:"2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"13:30",type:"servico",value:400,who:"Diego Campos",notes:"Serviço iniciado.",done:false},
+ {id:6,title:"Receber: limpeza e instalação de ar-condicionado",date:"2026-11-20",time:"",type:"receber",value:500,who:"Irmã Neide",notes:"",done:false},
  {id:7,title:"Receber: 2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"",type:"receber",value:400,who:"Diego Campos",notes:"",done:false},
- {id:8,title:"Limpeza de 2 ar-condicionados",date:"2026-11-18",time:"",type:"servico",value:400,who:"Felipe",notes:"Data a confirmar.",done:false},
- {id:9,title:"Receber: limpeza de 2 ar-condicionados",date:"2026-11-18",time:"",type:"receber",value:400,who:"Felipe",notes:"Data a confirmar.",done:false},
+ {id:8,title:"Limpeza de 2 ar-condicionados",date:"2026-11-29",time:"",type:"servico",value:400,who:"Felipe",notes:"",done:false},
+ {id:9,title:"Receber: limpeza de 2 ar-condicionados",date:"2026-11-29",time:"",type:"receber",value:400,who:"Felipe",notes:"",done:false},
  {id:4,title:"Receber contrato (planejamento)",date:"2026-12-05",time:"",type:"receber",value:800,who:"LG Instalações",notes:"",done:false},
  {id:5,title:"Receber pagamento",date:"2026-12-05",time:"",type:"receber",value:750,who:"Burim Refrigeração",notes:"",done:false}
 ];
@@ -176,6 +176,17 @@ try{
   if(!localStorage.getItem("organizador-mig3")){
     for(const n of initial.filter(x=>x.id===8||x.id===9)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
     save(); localStorage.setItem("organizador-mig3","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig4")){
+    for(const t of tasks){
+      if((t.id===8||t.id===9)&&t.date==="2026-11-18"){t.date="2026-11-29";if(t.notes==="Data a confirmar.")t.notes=""}
+      if((t.id===2||t.id===6)&&t.who==="Irmã da igreja")t.who="Irmã Neide";
+      if((t.id===2||t.id===3)&&!t.notes)t.notes="Serviço iniciado.";
+    }
+    save(); localStorage.setItem("organizador-mig4","1");
   }
 }catch(e){}
 
