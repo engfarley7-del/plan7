@@ -260,6 +260,25 @@ try{
   }
 }catch(e){}
 
+/* Todo serviço com valor tem um recebimento ligado; isso garante o total no painel */
+function reconcile(){
+  let ch=false;
+  for(const t of tasks.slice()){
+    if(t.type==="receber") continue;
+    const v=Number(t.value)||0;
+    const p=t.pair?tasks.find(x=>x.id===t.pair):null;
+    if(v>0&&!p){
+      const nid=t.id+1000000;
+      if(!tasks.some(x=>x.id===nid)){
+        tasks.push({id:nid,done:false,title:"Receber: "+t.title,date:t.date,time:"",type:"receber",value:t.value,who:t.who,notes:"",pair:t.id});
+      }
+      t.pair=nid;ch=true;
+    }
+  }
+  if(ch)save();
+}
+reconcile();
+
 const $=s=>document.querySelector(s);
 const money=v=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2});
 const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
@@ -345,7 +364,19 @@ $("#form").addEventListener("submit",e=>{
   e.preventDefault();
   const d={title:$("#fTitle").value.trim(),date:$("#fDate").value,time:$("#fTime").value,type:$("#fType").value,
     value:$("#fVal").value===""?"":Number($("#fVal").value),who:$("#fWho").value.trim(),notes:$("#fNotes").value.trim(),alert:$("#fAlert").value.trim()};
-  if(editing)Object.assign(editing,d);
+  if(editing){
+    const old={date:editing.date,who:editing.who};
+    Object.assign(editing,d);
+    const p=editing.pair?tasks.find(x=>x.id===editing.pair):null;
+    if(p){
+      if(editing.type==="receber"||(Number(d.value)||0)>0){
+        p.value=d.value;
+        if(p.date===old.date)p.date=d.date;
+        if(p.who===old.who)p.who=d.who;
+      }else if(!p.done){ tasks=tasks.filter(x=>x!==p); delete editing.pair; }
+    }
+    reconcile();
+  }
   else{
     const id=Date.now();
     const auto=d.type!=="receber"&&d.value!==""&&d.value>0&&$("#fAuto").checked;
