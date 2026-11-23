@@ -162,7 +162,7 @@ const initial=[
  {id:7,title:"Receber: 2 instalações + 2 ventiladores de teto",date:"2026-11-20",time:"",type:"receber",value:400,who:"Diego Campos",notes:"",done:false,pair:3},
  {id:8,title:"Limpeza de 2 ar-condicionados",date:"2026-11-29",time:"",type:"servico",value:400,who:"Felipe",notes:"",done:false,pair:9},
  {id:9,title:"Receber: limpeza de 2 ar-condicionados",date:"2026-11-29",time:"",type:"receber",value:400,who:"Felipe",notes:"",done:false,pair:8},
- {id:10,title:"Limpeza de 2 ar-condicionados (R$ 200 cada)",date:"2026-11-26",time:"",type:"servico",value:400,who:"Mãe da Aline",notes:"",done:false,pair:11},
+ {id:10,title:"Limpeza de 2 ar-condicionados (R$ 200 cada)",date:"2026-11-26",time:"",type:"servico",value:400,who:"Mãe da Aline",notes:"",done:false,pair:11,alert:"Confirmar a nova data com a mãe da Aline."},
  {id:11,title:"Receber: limpeza de 2 ar-condicionados",date:"2026-11-26",time:"",type:"receber",value:400,who:"Mãe da Aline",notes:"2 x R$ 200",done:false,pair:10},
  {id:12,title:"Limpeza de 3 ar-condicionados em Sinop (R$ 200 cada)",date:"2026-11-23",time:"",type:"servico",value:600,who:"Pablo",notes:"Sinop-MT",done:false,pair:13},
  {id:13,title:"Receber: limpeza de 3 ar-condicionados em Sinop",date:"2026-11-23",time:"",type:"receber",value:600,who:"Pablo",notes:"3 x R$ 200",done:false,pair:12},
@@ -243,6 +243,13 @@ try{
   if(!localStorage.getItem("organizador-mig10")){
     for(const n of initial.filter(x=>x.id===14)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
     save(); localStorage.setItem("organizador-mig10","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig11")){
+    const t=tasks.find(x=>x.id===10); if(t&&!t.alert) t.alert="Confirmar a nova data com a mãe da Aline.";
+    save(); localStorage.setItem("organizador-mig11","1");
   }
 }catch(e){}
 
