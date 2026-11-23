@@ -167,6 +167,7 @@ const initial=[
  {id:12,title:"Limpeza de 3 ar-condicionados em Sinop (R$ 200 cada)",date:"2026-11-23",time:"",type:"servico",value:600,who:"Pablo",notes:"Sinop-MT",done:false,pair:13},
  {id:13,title:"Receber: limpeza de 3 ar-condicionados em Sinop",date:"2026-11-23",time:"",type:"receber",value:600,who:"Pablo",notes:"3 x R$ 200",done:false,pair:12},
  {id:14,title:"Visita técnica: verificar local de instalação de 1 ar-condicionado",date:"2026-11-25",time:"",type:"servico",value:"",who:"Jason Godoy",notes:"Manhã. Só a visita, o serviço de instalação será depois.",done:false,alert:"Comprar suporte externo. Verificar se o ar-condicionado novo já vem com tubulação ou se já há tubulação no local da instalação."},
+ {id:15,title:"Limpeza de 2 ar-condicionados",date:"2026-11-24",time:"",type:"servico",value:400,who:"Matheus",notes:"",done:false},
  {id:4,title:"Receber contrato (planejamento)",date:"2026-12-05",time:"",type:"receber",value:800,who:"LG Instalações",notes:"",done:false},
  {id:5,title:"Receber pagamento",date:"2026-12-05",time:"",type:"receber",value:750,who:"Burim Refrigeração",notes:"",done:false}
 ];
@@ -257,6 +258,13 @@ try{
   if(!localStorage.getItem("organizador-mig12")){
     const t=tasks.find(x=>x.id===8); if(t&&!t.alert) t.alert="Pendente de confirmação de data com o Felipe.";
     save(); localStorage.setItem("organizador-mig12","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig13")){
+    for(const n of initial.filter(x=>x.id===15)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
+    save(); localStorage.setItem("organizador-mig13","1");
   }
 }catch(e){}
 
