@@ -22,9 +22,6 @@ header{background:var(--navy);padding:22px 16px 26px}
 .bl{font-size:.6rem;letter-spacing:.2em;color:var(--blue2);margin-top:4px;font-weight:500}
 .hoje{color:#9FB0C4;font-size:.9rem;margin-top:18px}
 .wrap{max-width:760px;margin:0 auto;padding:18px 16px 110px}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:#E2E8F0;border-radius:14px;padding:4px;margin-bottom:14px}
-.seg button{border:0;background:none;padding:11px;border-radius:11px;font:inherit;font-weight:500;color:var(--mut);cursor:pointer;letter-spacing:.02em}
-.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(10,22,38,.12)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stat{background:var(--card);border:1px solid #2A3B52;border-radius:20px;padding:14px}
 .stat b{display:block;font-size:1.2rem;color:#fff}
@@ -97,31 +94,26 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
 </header>
 
 <div class="wrap">
-  <div class="seg" id="seg">
-    <button class="on" data-v="tarefa">Tarefas</button>
-    <button data-v="receber">Recebimentos</button>
-  </div>
-
   <div class="stats">
-    <div class="stat"><b id="sPend">0</b><span>Tarefas pendentes</span></div>
+    <div class="stat"><b id="sPend">0</b><span>Eventos pendentes</span></div>
     <div class="stat"><b id="sRec">R$ 0</b><span>A receber</span></div>
     <div class="stat"><b id="sOk">R$ 0</b><span>Já recebido</span></div>
   </div>
 
   <div class="tabs" id="tabs">
-    <button class="tab on" data-f="pend">Pendentes</button>
-    <button class="tab" data-f="all">Todas</button>
-    <button class="tab" data-f="done">Concluídas</button>
+    <button class="tab on" data-f="all">Todos</button>
+    <button class="tab" data-f="pend">Pendentes</button>
+    <button class="tab" data-f="done">Concluídos</button>
   </div>
 
   <div id="list"></div>
 </div>
 
-<button class="fab" id="add">+ Nova tarefa</button>
+<button class="fab" id="add">+ Novo evento</button>
 
 <div class="ov" id="ov">
   <form class="modal" id="form">
-    <h2 id="mt">Nova tarefa</h2>
+    <h2 id="mt">Novo evento</h2>
     <label>Título</label>
     <input id="fTitle" required placeholder="Ex.: Instalação de ar-condicionado">
     <div class="row">
@@ -172,7 +164,7 @@ const initial=[
  {id:4,title:"Receber contrato (planejamento)",date:"2026-12-05",time:"",type:"receber",value:800,who:"LG Instalações",notes:"",done:false},
  {id:5,title:"Receber pagamento",date:"2026-12-05",time:"",type:"receber",value:750,who:"Burim Refrigeração",notes:"",done:false}
 ];
-let tasks,filter="pend",view="tarefa",editing=null,mem=null;
+let tasks,filter="all",editing=null,mem=null;
 function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return mem||initial.map(x=>({...x}))}
 function save(){mem=tasks;try{localStorage.setItem(KEY,JSON.stringify(tasks))}catch(e){}}
 tasks=load();
@@ -307,20 +299,18 @@ const names={servico:"Serviço",receber:"Recebimento",divulgacao:"Divulgação",
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 const pairOf=t=>t.pair?tasks.find(x=>x.id===t.pair):null;
+/* recebimento ligado a um serviço: aparece dentro do card do serviço, não separado */
+const isShadow=t=>t.type==="receber"&&!!t.pair&&tasks.some(x=>x.id===t.pair&&x.type!=="receber");
 const isPaid=t=>{const p=pairOf(t);return p?p.done:!!t.paid};
 function render(){
   $("#hoje").textContent="Hoje é "+new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-  $("#sPend").textContent=tasks.filter(t=>t.type!=="receber"&&!t.done).length;
+  $("#sPend").textContent=tasks.filter(t=>!t.done&&!isShadow(t)).length;
   const sum=f=>tasks.filter(t=>t.type==="receber"&&f(t)).reduce((a,t)=>a+(Number(t.value)||0),0);
   $("#sRec").textContent=money(sum(t=>!t.done));
   $("#sOk").textContent=money(sum(t=>t.done));
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.f===filter));
-  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
-  $("#tabs").children[0].textContent=view==="receber"?"A receber":"Pendentes";
-  $("#tabs").children[2].textContent=view==="receber"?"Recebidos":"Concluídas";
-  $("#add").textContent=view==="receber"?"+ Novo recebimento":"+ Nova tarefa";
 
-  const vis=tasks.filter(t=>(view==="receber")===(t.type==="receber"))
+  const vis=tasks.filter(t=>!isShadow(t))
     .filter(t=>filter==="all"||(filter==="pend"?!t.done:t.done))
     .sort((a,b)=>(a.date+(a.time||"99:99")).localeCompare(b.date+(b.time||"99:99")));
   if(!vis.length){$("#list").innerHTML='<div class="empty">Nada por aqui.</div>';return}
@@ -363,12 +353,11 @@ $("#list").addEventListener("click",e=>{
   if(a==="pay"){const p=pairOf(t);if(p)p.done=!isPaid(t);else t.paid=!isPaid(t);save();render()}
 });
 $("#tabs").addEventListener("click",e=>{if(e.target.dataset.f){filter=e.target.dataset.f;render()}});
-$("#seg").addEventListener("click",e=>{if(e.target.dataset.v){view=e.target.dataset.v;render()}});
 
 function openForm(t){
-  editing=t||null;$("#mt").textContent=t?"Editar tarefa":"Nova tarefa";
+  editing=t||null;$("#mt").textContent=t?"Editar evento":"Novo evento";
   $("#fTitle").value=t?t.title:"";$("#fDate").value=t?t.date:todayISO();$("#fTime").value=t?t.time:"";
-  $("#fType").value=t?t.type:(view==="receber"?"receber":"servico");$("#fVal").value=t?t.value:"";$("#fWho").value=t?t.who:"";$("#fNotes").value=t?t.notes:"";$("#fAlert").value=t?(t.alert||""):"";
+  $("#fType").value=t?t.type:"servico";$("#fVal").value=t?t.value:"";$("#fWho").value=t?t.who:"";$("#fNotes").value=t?t.notes:"";$("#fAlert").value=t?(t.alert||""):"";
   $("#fAuto").checked=!t;$("#fAuto").parentElement.style.display=t?"none":"flex";
   $("#ov").classList.add("on");setTimeout(()=>$("#fTitle").focus(),50);
 }
