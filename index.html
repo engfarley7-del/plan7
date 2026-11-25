@@ -227,6 +227,11 @@ const initial=[
  {id:14,title:"Visita técnica: verificar local de instalação de 1 ar-condicionado",date:"2026-11-25",time:"",type:"servico",value:"",who:"Jason Godoy",notes:"Manhã. Só a visita, o serviço de instalação será depois.",done:false,alert:"Comprar suporte externo. Verificar se o ar-condicionado novo já vem com tubulação ou se já há tubulação no local da instalação."},
  {id:15,title:"Limpeza de 2 ar-condicionados",date:"2026-11-24",time:"",type:"servico",value:400,who:"Matheus",notes:"",done:false},
  {id:16,title:"Limpeza de 1 ar-condicionado em Sinop",date:"2026-11-24",time:"",type:"servico",value:200,who:"Matheus",notes:"Sinop-MT",done:true},
+ {id:17,title:"Aditivo CT Precisamec",date:"2027-01-05",time:"",type:"receber",value:2130,who:"Precisamec",notes:"",done:false,alert:"Dia do recebimento a confirmar."},
+ {id:18,title:"Precisamec CT torque",date:"2026-12-05",time:"",type:"receber",value:1400,who:"Precisamec",notes:"",done:false,alert:"Dia do recebimento a confirmar."},
+ {id:19,title:"Precisamec CT torque",date:"2027-01-05",time:"",type:"receber",value:1400,who:"Precisamec",notes:"",done:false,alert:"Dia do recebimento a confirmar."},
+ {id:20,title:"Precisamec Ar Comp.",date:"2026-12-05",time:"",type:"receber",value:1400,who:"Precisamec",notes:"",done:false,alert:"Dia do recebimento a confirmar."},
+ {id:21,title:"Precisamec Ar Comp.",date:"2027-01-05",time:"",type:"receber",value:1400,who:"Precisamec",notes:"",done:false,alert:"Dia do recebimento a confirmar."},
  {id:4,title:"Receber contrato (planejamento)",date:"2026-12-05",time:"",type:"receber",value:800,who:"LG Instalações",notes:"",done:false},
  {id:5,title:"Receber pagamento",date:"2026-12-05",time:"",type:"receber",value:750,who:"Burim Refrigeração",notes:"",done:false}
 ];
@@ -331,6 +336,13 @@ try{
   if(!localStorage.getItem("organizador-mig14")){
     for(const n of initial.filter(x=>x.id===16)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
     save(); localStorage.setItem("organizador-mig14","1");
+  }
+}catch(e){}
+
+try{
+  if(!localStorage.getItem("organizador-mig15")){
+    for(const n of initial.filter(x=>x.id>=17&&x.id<=21)) if(!tasks.some(t=>t.id===n.id)) tasks.push({...n});
+    save(); localStorage.setItem("organizador-mig15","1");
   }
 }catch(e){}
 
@@ -476,11 +488,6 @@ const finSeed={
   ],
   items:[
     {id:"e1",kind:"entrada",month:"2026-12",name:"Poupando",source:"",day:null,value:4500},
-    {id:"e2",kind:"entrada",month:"2027-01",name:"Aditivo CT Precisamec",source:"Plan7",day:null,value:2130},
-    {id:"e3",kind:"entrada",month:"2026-12",name:"Precisamec CT torque",source:"Plan7",day:null,value:1400},
-    {id:"e4",kind:"entrada",month:"2027-01",name:"Precisamec CT torque",source:"Plan7",day:null,value:1400},
-    {id:"e5",kind:"entrada",month:"2026-12",name:"Precisamec Ar Comp.",source:"Plan7",day:null,value:1400},
-    {id:"e6",kind:"entrada",month:"2027-01",name:"Precisamec Ar Comp.",source:"Plan7",day:null,value:1400},
     {id:"e7",kind:"entrada",month:"2027-02",name:"Invest. Renda Fixa 1% ao mês",source:"",day:null,value:39.15}
   ]
 };
@@ -489,6 +496,20 @@ function finLoad(){try{const r=localStorage.getItem(FKEY);if(r)return JSON.parse
 let finMem=null;
 function finSave(){finMem=fin;try{localStorage.setItem(FKEY,JSON.stringify(fin))}catch(e){}}
 fin=finMem||finLoad();
+/* entradas Plan7 que estavam só no Financeiro agora são eventos de recebimento */
+try{
+  if(!localStorage.getItem("plan7-mig-fin1")){
+    const map={e2:17,e3:18,e4:19,e5:20,e6:21};
+    for(const it of fin.items.slice()){
+      const eid=map[it.id]; if(!eid) continue;
+      const ev=tasks.find(t=>t.id===eid);
+      if(ev&&it.done)ev.done=true;
+      fin.items=fin.items.filter(x=>x!==it);
+    }
+    finSave();save();localStorage.setItem("plan7-mig-fin1","1");
+  }
+}catch(e){}
+
 const mAdd=(m,n)=>{let[y,mo]=m.split("-").map(Number);mo+=n;y+=Math.floor((mo-1)/12);mo=((mo-1)%12+12)%12+1;return y+"-"+String(mo).padStart(2,"0")};
 const mName=m=>{const[y,mo]=m.split("-").map(Number);return new Date(y,mo-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"})};
 const curMonth=()=>todayISO().slice(0,7);
@@ -504,9 +525,14 @@ function ensureMonth(m){
   if(ch)finSave();
 }
 /* recebimentos do organizador de eventos entram nas entradas do mês */
+function evName(t){
+  const clean=String(t.title||"").replace(/^Receber:?\s*/i,"").trim(), w=t.who||"";
+  if(!w)return clean||"Recebimento";
+  return clean.toLowerCase().includes(w.toLowerCase())?clean:(clean?w+" · "+clean:w);
+}
 function evEntries(m){
   return tasks.filter(t=>t.type==="receber"&&t.date.slice(0,7)===m).map(t=>({
-    virtual:true,id:"ev"+t.id,evId:t.id,kind:"entrada",name:t.who||t.title,source:"Plan7",
+    virtual:true,id:"ev"+t.id,evId:t.id,kind:"entrada",name:evName(t),source:"Plan7",
     day:+t.date.slice(8,10),value:Number(t.value)||0,done:!!t.done}));
 }
 const planned=i=>Number(i.value)||0;
