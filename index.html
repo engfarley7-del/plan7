@@ -458,7 +458,7 @@ $("#form").addEventListener("submit",e=>{
   save();close();render();
 });
 /* =================== FINANCEIRO =================== */
-const FKEY="plan7-fin-v1", FIN_START="2026-12";
+const FKEY="plan7-fin-v1", FIN_START="2026-12", FIN_MIN="2026-11";
 const finSeed={
   skips:{},
   recurring:[
@@ -487,7 +487,7 @@ fin=finMem||finLoad();
 const mAdd=(m,n)=>{let[y,mo]=m.split("-").map(Number);mo+=n;y+=Math.floor((mo-1)/12);mo=((mo-1)%12+12)%12+1;return y+"-"+String(mo).padStart(2,"0")};
 const mName=m=>{const[y,mo]=m.split("-").map(Number);return new Date(y,mo-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"})};
 const curMonth=()=>todayISO().slice(0,7);
-let finMonth=curMonth()<FIN_START?FIN_START:curMonth();
+let finMonth=curMonth()<FIN_MIN?FIN_MIN:curMonth();
 
 function ensureMonth(m){
   let ch=false;
@@ -514,6 +514,7 @@ function monthData(m){
   return {ent,sai,entP:sum(ent,planned),entR:sum(ent,real),saiP:sum(sai,planned),saiR:sum(sai,real)};
 }
 function accumulated(m){
+  if(m<FIN_START){const d=monthData(m);return d.entP-d.saiP}
   let acc=0;
   for(let x=FIN_START;x<=m;x=mAdd(x,1)){const d=monthData(x);acc+=d.entP-d.saiP}
   return acc;
@@ -529,12 +530,12 @@ const fm=v=>money(Math.round(v*100)/100);
 function renderFin(){
   const m=finMonth,d=monthData(m),sm=d.entP-d.saiP,ac=accumulated(m);
   $("#mLabel").textContent=mName(m);
-  $("#mPrev").disabled=m<=FIN_START;
+  $("#mPrev").disabled=m<=FIN_MIN;
   $("#fStats").innerHTML=
     `<div class="stat"><b>${fm(d.entP)}</b><span>Entradas</span><small>recebido ${fm(d.entR)}</small></div>
      <div class="stat"><b>${fm(d.saiP)}</b><span>Saídas</span><small>pago ${fm(d.saiR)}</small></div>
      <div class="stat ${sm<0?"neg":""}"><b>${fm(sm)}</b><span>Saldo do mês</span><small>realizado ${fm(d.entR-d.saiR)}</small></div>
-     <div class="stat ${ac<0?"neg":""}"><b>${fm(ac)}</b><span>Saldo acumulado</span><small>desde ${mName(FIN_START)}</small></div>`;
+     <div class="stat ${ac<0?"neg":""}"><b>${fm(ac)}</b><span>Saldo acumulado</span><small>${m<FIN_START?"o acumulado começa em "+mName(FIN_START):"desde "+mName(FIN_START)}</small></div>`;
   const row=(i,isEnt)=>{
     const late=isLateF(i,m);
     const sub=[i.day?("Dia "+i.day):"",i.source||"",i.recId?"recorrente":"",i.virtual?"do painel de eventos":""].filter(Boolean).join(" · ");
@@ -551,7 +552,7 @@ function renderFin(){
      <div class="fsec"><h3>Despesas <span>${fm(d.saiP)}</span></h3>${d.sai.sort(byDay).map(i=>row(i,false)).join("")||'<div class="fm" style="padding:10px 0">Nenhuma despesa neste mês.</div>'}</div>`;
 }
 
-$("#mPrev").onclick=()=>{if(finMonth>FIN_START){finMonth=mAdd(finMonth,-1);renderFin()}};
+$("#mPrev").onclick=()=>{if(finMonth>FIN_MIN){finMonth=mAdd(finMonth,-1);renderFin()}};
 $("#mNext").onclick=()=>{finMonth=mAdd(finMonth,1);renderFin()};
 $("#fList").addEventListener("click",e=>{
   const el=e.target.closest("[data-fa]");if(!el)return;
