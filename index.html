@@ -347,6 +347,11 @@ function reconcile(){
         tasks.push({id:nid,done:false,title:"Receber: "+t.title,date:t.date,time:"",type:"receber",value:t.value,who:t.who,notes:"",pair:t.id});
       }
       t.pair=nid;ch=true;
+    }else if(p&&p.type==="receber"&&!p.done){
+      /* o recebimento ligado acompanha o serviço (data, valor e cliente) até ser recebido */
+      if(p.date!==t.date){p.date=t.date;ch=true}
+      if(v>0&&Number(p.value)!==v){p.value=t.value;ch=true}
+      if(p.who!==t.who){p.who=t.who;ch=true}
     }
   }
   if(ch)save();
