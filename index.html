@@ -125,10 +125,8 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
   </div>
 
   <div id="pEv">
-  <div class="stats">
+  <div class="stats" style="grid-template-columns:1fr">
     <div class="stat"><b id="sPend">0</b><span>Eventos pendentes</span></div>
-    <div class="stat"><b id="sRec">R$ 0</b><span>A receber</span></div>
-    <div class="stat"><b id="sOk">R$ 0</b><span>Já recebido</span></div>
   </div>
 
   <div class="tabs" id="tabs">
@@ -388,9 +386,6 @@ const isPaid=t=>{const p=pairOf(t);return p?p.done:!!t.paid};
 function render(){
   $("#hoje").textContent="Hoje é "+new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   $("#sPend").textContent=tasks.filter(t=>!t.done&&!isShadow(t)).length;
-  const sum=f=>tasks.filter(t=>t.type==="receber"&&f(t)).reduce((a,t)=>a+(Number(t.value)||0),0);
-  $("#sRec").textContent=money(sum(t=>!t.done));
-  $("#sOk").textContent=money(sum(t=>t.done));
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.f===filter));
 
   const vis=tasks.filter(t=>!isShadow(t))
