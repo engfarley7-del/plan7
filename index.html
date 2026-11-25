@@ -22,6 +22,31 @@ header{background:var(--navy);padding:22px 16px 26px}
 .bl{font-size:.6rem;letter-spacing:.2em;color:var(--blue2);margin-top:4px;font-weight:500}
 .hoje{color:#9FB0C4;font-size:.9rem;margin-top:18px}
 .wrap{max-width:760px;margin:0 auto;padding:18px 16px 110px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#E2E8F0;border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{border:0;background:none;padding:11px;border-radius:11px;font:inherit;font-weight:500;color:var(--mut);cursor:pointer;letter-spacing:.02em}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(10,22,38,.12)}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mnav b{font-weight:500;font-size:1.15rem;text-transform:capitalize}
+.mnav button{border:1px solid var(--line);background:#fff;border-radius:99px;width:38px;height:38px;font:inherit;font-size:1.1rem;cursor:pointer;color:var(--ink)}
+.mnav button:disabled{opacity:.35;cursor:default}
+.stats2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat small{display:block;font-size:.72rem;color:#9FB0C4;margin-top:3px}
+.stat.neg b{color:#FF8A80}
+.fsec{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 14px 10px;margin-bottom:14px}
+.fsec h3{margin:12px 0 4px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);font-weight:500;display:flex;justify-content:space-between}
+.fsec h3 span{color:var(--ink);letter-spacing:.02em;text-transform:none;font-size:.85rem}
+.frow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.frow:first-of-type{border-top:0}
+.frow.done .ft{color:var(--mut)}
+.frow.late{background:#FEF2F2;margin:0 -14px;padding:10px 14px;border-radius:12px}
+.frow.late .fm{color:#D93025}
+.fb{flex:1;min-width:0}
+.ft{font-weight:500}
+.fm{font-size:.78rem;color:var(--mut);margin-top:2px}
+.fv{text-align:right;font-weight:500;white-space:nowrap}
+.fv small{display:block;font-weight:400;font-size:.7rem;color:#1A9C5B}
+.fnote{font-size:.78rem;color:var(--mut);margin:8px 0 0}
+.dbtn{flex:1;padding:11px;border-radius:12px;border:1px solid #F3B4B4;background:#FEF2F2;color:#B3261E;font:inherit;font-weight:500;cursor:pointer;font-size:.85rem}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stat{background:var(--card);border:1px solid #2A3B52;border-radius:20px;padding:14px}
 .stat b{display:block;font-size:1.2rem;color:#fff}
@@ -94,6 +119,12 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
 </header>
 
 <div class="wrap">
+  <div class="seg" id="nav">
+    <button class="on" data-p="ev">Eventos</button>
+    <button data-p="fin">Financeiro</button>
+  </div>
+
+  <div id="pEv">
   <div class="stats">
     <div class="stat"><b id="sPend">0</b><span>Eventos pendentes</span></div>
     <div class="stat"><b id="sRec">R$ 0</b><span>A receber</span></div>
@@ -107,9 +138,44 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);borde
   </div>
 
   <div id="list"></div>
+  </div>
+
+  <div id="pFin" style="display:none">
+    <div class="mnav">
+      <button id="mPrev" aria-label="Mês anterior">&#8249;</button>
+      <b id="mLabel"></b>
+      <button id="mNext" aria-label="Próximo mês">&#8250;</button>
+    </div>
+    <div class="stats2" id="fStats"></div>
+    <div id="fList"></div>
+  </div>
 </div>
 
 <button class="fab" id="add">+ Novo evento</button>
+
+<div class="ov" id="ovF">
+  <form class="modal" id="formF">
+    <h2 id="fmt">Novo lançamento</h2>
+    <label>Tipo</label>
+    <select id="gKind"><option value="saida">Despesa</option><option value="entrada">Entrada</option></select>
+    <label>Descrição</label>
+    <input id="gName" required placeholder="Ex.: Aluguel">
+    <div class="row">
+      <div><label>Dia do mês (opcional)</label><input type="number" id="gDay" min="1" max="31" placeholder="Ex.: 10"></div>
+      <div><label>Fonte (opcional)</label><input id="gSrc" placeholder="Ex.: Plan7"></div>
+    </div>
+    <div class="row">
+      <div><label>Valor previsto R$</label><input type="number" id="gVal" min="0" step="0.01" required></div>
+      <div><label>Valor real R$ (opcional)</label><input type="number" id="gAct" min="0" step="0.01" placeholder="se diferente"></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.85rem;color:var(--ink);font-weight:400" id="gRepL"><input type="checkbox" id="gRep" style="width:auto;accent-color:#1D6FD8"><span id="gRepT">Repetir todo mês</span></label>
+    <div class="btns">
+      <button type="button" class="btn" id="gCancel">Cancelar</button>
+      <button class="btn p">Salvar</button>
+    </div>
+    <div class="btns" id="gDel" style="display:none"></div>
+  </form>
+</div>
 
 <div class="ov" id="ov">
   <form class="modal" id="form">
@@ -362,7 +428,7 @@ function openForm(t){
   $("#ov").classList.add("on");setTimeout(()=>$("#fTitle").focus(),50);
 }
 const close=()=>$("#ov").classList.remove("on");
-$("#add").onclick=()=>openForm();
+$("#add").onclick=()=>{page==="fin"?openFin():openForm()};
 $("#cancel").onclick=close;
 $("#ov").addEventListener("click",e=>{if(e.target.id==="ov")close()});
 $("#form").addEventListener("submit",e=>{
@@ -391,6 +457,181 @@ $("#form").addEventListener("submit",e=>{
   }
   save();close();render();
 });
+/* =================== FINANCEIRO =================== */
+const FKEY="plan7-fin-v1", FIN_START="2026-12";
+const finSeed={
+  skips:{},
+  recurring:[
+    {id:"r1",kind:"saida",name:"Alimentação",day:null,value:1000,from:"2026-12",to:null},
+    {id:"r2",kind:"saida",name:"Aluguel",day:10,value:1600,from:"2026-12",to:null},
+    {id:"r3",kind:"saida",name:"Ag. Luz Int.",day:null,value:450,from:"2026-12",to:null},
+    {id:"r4",kind:"saida",name:"FIES",day:20,value:590,from:"2026-12",to:null},
+    {id:"r5",kind:"saida",name:"Plano de Saúde",day:25,value:445,from:"2026-12",to:null},
+    {id:"r6",kind:"saida",name:"Terreno",day:15,value:850,from:"2026-12",to:null}
+  ],
+  items:[
+    {id:"e1",kind:"entrada",month:"2026-12",name:"Poupando",source:"",day:null,value:4500},
+    {id:"e2",kind:"entrada",month:"2027-01",name:"Aditivo CT Precisamec",source:"Plan7",day:null,value:2130},
+    {id:"e3",kind:"entrada",month:"2026-12",name:"Precisamec CT torque",source:"Plan7",day:null,value:1400},
+    {id:"e4",kind:"entrada",month:"2027-01",name:"Precisamec CT torque",source:"Plan7",day:null,value:1400},
+    {id:"e5",kind:"entrada",month:"2026-12",name:"Precisamec Ar Comp.",source:"Plan7",day:null,value:1400},
+    {id:"e6",kind:"entrada",month:"2027-01",name:"Precisamec Ar Comp.",source:"Plan7",day:null,value:1400},
+    {id:"e7",kind:"entrada",month:"2027-02",name:"Invest. Renda Fixa 1% ao mês",source:"",day:null,value:39.15}
+  ]
+};
+let fin;
+function finLoad(){try{const r=localStorage.getItem(FKEY);if(r)return JSON.parse(r)}catch(e){}return JSON.parse(JSON.stringify(finSeed))}
+let finMem=null;
+function finSave(){finMem=fin;try{localStorage.setItem(FKEY,JSON.stringify(fin))}catch(e){}}
+fin=finMem||finLoad();
+const mAdd=(m,n)=>{let[y,mo]=m.split("-").map(Number);mo+=n;y+=Math.floor((mo-1)/12);mo=((mo-1)%12+12)%12+1;return y+"-"+String(mo).padStart(2,"0")};
+const mName=m=>{const[y,mo]=m.split("-").map(Number);return new Date(y,mo-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"})};
+const curMonth=()=>todayISO().slice(0,7);
+let finMonth=curMonth()<FIN_START?FIN_START:curMonth();
+
+function ensureMonth(m){
+  let ch=false;
+  for(const r of fin.recurring){
+    if(r.from<=m&&(!r.to||m<=r.to)&&!fin.skips[r.id+"|"+m]&&!fin.items.some(i=>i.recId===r.id&&i.month===m)){
+      fin.items.push({id:r.id+"_"+m,recId:r.id,kind:r.kind,month:m,name:r.name,source:r.source||"",day:r.day,value:r.value,done:false});ch=true;
+    }
+  }
+  if(ch)finSave();
+}
+/* recebimentos do organizador de eventos entram nas entradas do mês */
+function evEntries(m){
+  return tasks.filter(t=>t.type==="receber"&&t.date.slice(0,7)===m).map(t=>({
+    virtual:true,id:"ev"+t.id,evId:t.id,kind:"entrada",name:t.who||t.title,source:"Plan7",
+    day:+t.date.slice(8,10),value:Number(t.value)||0,done:!!t.done}));
+}
+const planned=i=>Number(i.value)||0;
+const real=i=>i.done?((i.actual!==undefined&&i.actual!==null&&i.actual!=="")?Number(i.actual):planned(i)):0;
+function monthData(m){
+  ensureMonth(m);
+  const ent=fin.items.filter(i=>i.month===m&&i.kind==="entrada").concat(evEntries(m));
+  const sai=fin.items.filter(i=>i.month===m&&i.kind==="saida");
+  const sum=(a,f)=>a.reduce((x,i)=>x+f(i),0);
+  return {ent,sai,entP:sum(ent,planned),entR:sum(ent,real),saiP:sum(sai,planned),saiR:sum(sai,real)};
+}
+function accumulated(m){
+  let acc=0;
+  for(let x=FIN_START;x<=m;x=mAdd(x,1)){const d=monthData(x);acc+=d.entP-d.saiP}
+  return acc;
+}
+function isLateF(i,m){
+  if(i.done||!i.day)return false;
+  const due=new Date(+m.slice(0,4),+m.slice(5,7)-1,i.day);
+  return due<new Date(todayISO()+"T00:00");
+}
+const byDay=(a,b)=>(a.day||99)-(b.day||99)||a.name.localeCompare(b.name);
+const fm=v=>money(Math.round(v*100)/100);
+
+function renderFin(){
+  const m=finMonth,d=monthData(m),sm=d.entP-d.saiP,ac=accumulated(m);
+  $("#mLabel").textContent=mName(m);
+  $("#mPrev").disabled=m<=FIN_START;
+  $("#fStats").innerHTML=
+    `<div class="stat"><b>${fm(d.entP)}</b><span>Entradas</span><small>recebido ${fm(d.entR)}</small></div>
+     <div class="stat"><b>${fm(d.saiP)}</b><span>Saídas</span><small>pago ${fm(d.saiR)}</small></div>
+     <div class="stat ${sm<0?"neg":""}"><b>${fm(sm)}</b><span>Saldo do mês</span><small>realizado ${fm(d.entR-d.saiR)}</small></div>
+     <div class="stat ${ac<0?"neg":""}"><b>${fm(ac)}</b><span>Saldo acumulado</span><small>desde ${mName(FIN_START)}</small></div>`;
+  const row=(i,isEnt)=>{
+    const late=isLateF(i,m);
+    const sub=[i.day?("Dia "+i.day):"",i.source||"",i.recId?"recorrente":"",i.virtual?"do painel de eventos":""].filter(Boolean).join(" · ");
+    const diff=i.done&&i.actual!==undefined&&i.actual!==null&&i.actual!==""&&Number(i.actual)!==planned(i);
+    return `<div class="frow ${i.done?"done":""} ${late?"late":""}">
+      <input type="checkbox" class="chk" ${i.done?"checked":""} data-fid="${i.id}" data-fa="tog" title="${isEnt?"Recebido":"Pago"}">
+      <div class="fb"><div class="ft">${esc(i.name)}</div><div class="fm">${esc(sub)}${late?" · atrasado":""}</div></div>
+      <div class="fv">${fm(planned(i))}${diff?`<small>${isEnt?"recebido":"pago"} ${fm(Number(i.actual))}</small>`:""}</div>
+      ${i.virtual?"":`<button class="ib" data-fid="${i.id}" data-fa="edit">Editar</button>`}</div>`;
+  };
+  $("#fList").innerHTML=
+    `<div class="fsec"><h3>Entradas <span>${fm(d.entP)}</span></h3>${d.ent.sort(byDay).map(i=>row(i,true)).join("")||'<div class="fm" style="padding:10px 0">Nenhuma entrada neste mês.</div>'}
+      <p class="fnote">Recebimentos de serviços e clientes do painel de eventos entram aqui sozinhos, na data do evento.</p></div>
+     <div class="fsec"><h3>Despesas <span>${fm(d.saiP)}</span></h3>${d.sai.sort(byDay).map(i=>row(i,false)).join("")||'<div class="fm" style="padding:10px 0">Nenhuma despesa neste mês.</div>'}</div>`;
+}
+
+$("#mPrev").onclick=()=>{if(finMonth>FIN_START){finMonth=mAdd(finMonth,-1);renderFin()}};
+$("#mNext").onclick=()=>{finMonth=mAdd(finMonth,1);renderFin()};
+$("#fList").addEventListener("click",e=>{
+  const el=e.target.closest("[data-fa]");if(!el)return;
+  const id=el.dataset.fid,a=el.dataset.fa;
+  if(id.startsWith("ev")){const t=tasks.find(x=>x.id===+id.slice(2));if(a==="tog"&&t){t.done=el.checked;save();render();renderFin()}return}
+  const it=fin.items.find(x=>x.id===id);if(!it)return;
+  if(a==="tog"){it.done=el.checked;finSave();renderFin()}
+  if(a==="edit")openFin(it);
+});
+
+let editF=null;
+function openFin(it){
+  editF=it||null;
+  $("#fmt").textContent=it?"Editar lançamento":"Novo lançamento";
+  $("#gKind").value=it?it.kind:"saida";$("#gName").value=it?it.name:"";
+  $("#gDay").value=it&&it.day?it.day:"";$("#gSrc").value=it?(it.source||""):"";
+  $("#gVal").value=it?it.value:"";$("#gAct").value=it&&it.actual!=null?it.actual:"";
+  $("#gRep").checked=it?!!it.recId:false;
+  $("#gRepT").textContent=it&&it.recId?"Aplicar também aos meses seguintes":"Repetir todo mês";
+  const dd=$("#gDel");dd.innerHTML="";dd.style.display="none";
+  if(it){
+    dd.style.display="flex";
+    dd.innerHTML=`<button type="button" class="dbtn" id="gDelOne">Excluir só deste mês</button>`+(it.recId?`<button type="button" class="dbtn" id="gDelAll">Parar daqui para frente</button>`:"");
+    $("#gDelOne").onclick=()=>{
+      if(it.recId)fin.skips[it.recId+"|"+it.month]=true;
+      fin.items=fin.items.filter(x=>x!==it);finSave();closeF();renderFin();
+    };
+    if(it.recId)$("#gDelAll").onclick=()=>{
+      const r=fin.recurring.find(x=>x.id===it.recId);
+      if(r)r.to=mAdd(it.month,-1);
+      fin.items=fin.items.filter(x=>!(x.recId===it.recId&&x.month>=it.month&&(x===it||!x.done)));
+      finSave();closeF();renderFin();
+    };
+  }
+  $("#ovF").classList.add("on");setTimeout(()=>$("#gName").focus(),50);
+}
+const closeF=()=>$("#ovF").classList.remove("on");
+$("#gCancel").onclick=closeF;
+$("#ovF").addEventListener("click",e=>{if(e.target.id==="ovF")closeF()});
+$("#formF").addEventListener("submit",e=>{
+  e.preventDefault();
+  const f={kind:$("#gKind").value,name:$("#gName").value.trim(),day:$("#gDay").value?+$("#gDay").value:null,
+    source:$("#gSrc").value.trim(),value:Number($("#gVal").value)||0,actual:$("#gAct").value===""?null:Number($("#gAct").value)};
+  const rep=$("#gRep").checked;
+  if(editF){
+    Object.assign(editF,f);
+    if(editF.recId&&rep){
+      const r=fin.recurring.find(x=>x.id===editF.recId);
+      if(r)Object.assign(r,{kind:f.kind,name:f.name,day:f.day,source:f.source,value:f.value});
+      for(const x of fin.items)if(x.recId===editF.recId&&x.month>editF.month&&!x.done)
+        Object.assign(x,{kind:f.kind,name:f.name,day:f.day,source:f.source,value:f.value});
+    }else if(!editF.recId&&rep){
+      const rid="u"+Date.now();
+      fin.recurring.push({id:rid,kind:f.kind,name:f.name,day:f.day,source:f.source,value:f.value,from:mAdd(finMonth,1),to:null});
+    }
+  }else{
+    const id="m"+Date.now();
+    const it={id,kind:f.kind,month:finMonth,name:f.name,source:f.source,day:f.day,value:f.value,actual:f.actual,done:false};
+    if(rep){
+      const rid="u"+Date.now();
+      fin.recurring.push({id:rid,kind:f.kind,name:f.name,day:f.day,source:f.source,value:f.value,from:finMonth,to:null});
+      it.recId=rid;it.id=rid+"_"+finMonth;
+    }
+    fin.items.push(it);
+  }
+  finSave();closeF();renderFin();
+});
+
+/* navegação Eventos / Financeiro */
+let page="ev";
+function setPage(p){
+  page=p;
+  $("#pEv").style.display=p==="ev"?"":"none";
+  $("#pFin").style.display=p==="fin"?"":"none";
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  $("#add").textContent=p==="ev"?"+ Novo evento":"+ Novo lançamento";
+  if(p==="fin")renderFin();else render();
+}
+$("#nav").addEventListener("click",e=>{if(e.target.dataset.p)setPage(e.target.dataset.p)});
+
 render();
 </script>
 </body>
